@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraStudy AI - Study Planner & Doubt Solver</title>
+    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- KaTeX CSS for Math Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <span class="logo-text">AuraStudy<span class="highlight">.AI</span></span>
+            </div>
+            
+            <nav class="nav-links">
+                <a href="#dashboard" class="nav-link active" data-target="dashboard">
+                    <i class="fa-solid fa-house-chimney"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#planner" class="nav-link" data-target="planner">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <span>AI Planner</span>
+                </a>
+                <a href="#doubt-solver" class="nav-link" data-target="doubt-solver">
+                    <i class="fa-solid fa-circle-question"></i>
+                    <span>Doubt Solver</span>
+                </a>
+                <a href="#pomodoro" class="nav-link" data-target="pomodoro">
+                    <i class="fa-solid fa-hourglass-half"></i>
+                    <span>Focus Timer</span>
+                </a>
+                <a href="#flashcards" class="nav-link" data-target="flashcards">
+                    <i class="fa-solid fa-clone"></i>
+                    <span>Flashcards</span>
+                </a>
+                <a href="#settings" class="nav-link" data-target="settings">
+                    <i class="fa-solid fa-sliders"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="avatar">
+                        <i class="fa-solid fa-user-astronaut"></i>
+                    </div>
+                    <div class="user-info">
+                        <span class="username">Scholar Mode</span>
+                        <span class="status">Level 1 Spacefarer</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-left">
+                    <h1 id="page-title">Dashboard</h1>
+                    <p class="greeting-subtitle" id="greeting-text">Welcome back, Scholar! Ready to conquer today?</p>
+                </div>
+                <div class="header-right">
+                    <div class="api-key-badge" id="api-status-badge">
+                        <span class="badge-dot red"></span>
+                        <span class="badge-text">API Key Missing</span>
+                    </div>
+                    <div class="date-widget">
+                        <i class="fa-regular fa-calendar"></i>
+                        <span id="current-date">July 20, 2026</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                
+                <!-- DASHBOARD MODULE -->
+                <section id="dashboard" class="content-section active">
+                    <div class="welcome-card">
+                        <div class="welcome-info">
+                            <h2>Elevate Your Focus & Understanding</h2>
+                            <p>Generate optimized study plans, get instant math and code explanations with AI, and use synthesized soundscapes to master your sessions.</p>
+                            <button class="btn btn-primary" onclick="navigateToSection('planner')">
+                                <i class="fa-solid fa-bolt"></i> Generate Plan
+                            </button>
+                        </div>
+                        <div class="welcome-art">
+                            <i class="fa-solid fa-brain-circuit"></i>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <!-- Progress Cards -->
+                        <div class="stats-card glass">
+                            <div class="card-title">Study Progress</div>
+                            <div class="progress-ring-container">
+                                <svg class="progress-ring" width="120" height="120">
+                                    <circle class="progress-ring__circle-bg" stroke="rgba(255,255,255,0.05)" stroke-width="8" fill="transparent" r="50" cx="60" cy="60"/>
+                                    <circle class="progress-ring__circle" id="study-progress-circle" stroke="var(--accent-purple)" stroke-width="8" fill="transparent" r="50" cx="60" cy="60" stroke-dasharray="314.16" stroke-dashoffset="314.16"/>
+                                </svg>
+                                <div class="progress-ring-text" id="study-progress-text">0%</div>
+                            </div>
+                            <div class="stats-desc" id="stats-plan-info">No active study plan generated</div>
+                        </div>
+
+                        <div class="stats-card glass">
+                            <div class="card-title">Focus Time Today</div>
+                            <div class="progress-ring-container">
+                                <svg class="progress-ring" width="120" height="120">
+                                    <circle class="progress-ring__circle-bg" stroke="rgba(255,255,255,0.05)" stroke-width="8" fill="transparent" r="50" cx="60" cy="60"/>
+                                    <circle class="progress-ring__circle" id="focus-progress-circle" stroke="var(--accent-cyan)" stroke-width="8" fill="transparent" r="50" cx="60" cy="60" stroke-dasharray="314.16" stroke-dashoffset="314.16"/>
+                                </svg>
+                                <div class="progress-ring-text" id="focus-progress-text">0m</div>
+                            </div>
+                            <div class="stats-desc">Goal: 60 minutes</div>
+                        </div>
+
+                        <div class="stats-card glass">
+                            <div class="card-title">Doubts Solved</div>
+                            <div class="stat-large-val" id="doubt-solved-count">0</div>
+                            <div class="stats-desc">Questions asked to AI solver</div>
+                        </div>
+
+                        <div class="stats-card glass">
+                            <div class="card-title">Flashcards Mastered</div>
+                            <div class="stat-large-val" id="flashcard-mastered-count">0</div>
+                            <div class="stats-desc">Tested using Spaced Repetition</div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-row">
+                        <div class="daily-tasks-card glass">
+                            <h3><i class="fa-solid fa-list-check"></i> Today's Schedule</h3>
+                            <div class="todo-list" id="dashboard-todo-list">
+                                <div class="empty-state">
+                                    <p>Your timeline tasks will appear here once you generate a study plan!</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="quote-card glass">
+                            <h3><i class="fa-solid fa-quote-left"></i> Cosmic Inspiration</h3>
+                            <p class="quote-text" id="quote-content">"The mind is not a vessel to be filled, but a fire to be kindled."</p>
+                            <span class="quote-author" id="quote-author">— Plutarch</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- AI STUDY PLANNER MODULE -->
+                <section id="planner" class="content-section">
+                    <div class="planner-container">
+                        <div class="planner-form-panel glass">
+                            <h2>Create Study Blueprint</h2>
+                            <p class="section-desc">Answer a few questions, and our AI will build a custom learning roadmap.</p>
+                            
+                            <form id="study-planner-form">
+                                <div class="form-group">
+                                    <label for="planner-subjects">Subjects to Study (Comma-separated)</label>
+                                    <input type="text" id="planner-subjects" placeholder="e.g. Linear Algebra, Chemistry, JavaScript" required>
+                                </div>
+
+                                <div class="form-group-row">
+                                    <div class="form-group">
+                                        <label for="planner-exam-date">Target Exam/Goal Date</label>
+                                        <input type="date" id="planner-exam-date" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="planner-hours">Study Hours / Day</label>
+                                        <div class="slider-container">
+                                            <input type="range" id="planner-hours" min="1" max="12" value="3">
+                                            <span class="slider-val" id="hours-val">3 hours</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group-row">
+                                    <div class="form-group">
+                                        <label for="planner-style">Learning Style</label>
+                                        <select id="planner-style">
+                                            <option value="balanced">Balanced (Reading & Practice)</option>
+                                            <option value="visual">Visual (Diagrams & Videos)</option>
+                                            <option value="practice">Practice Heavy (Coding/Exercises)</option>
+                                            <option value="theoretical">Theoretical (Detailed Reading)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="planner-difficulty">Starting Level</label>
+                                        <select id="planner-difficulty">
+                                            <option value="beginner">Beginner (No background)</option>
+                                            <option value="intermediate" selected>Intermediate (Some concepts clear)</option>
+                                            <option value="advanced">Advanced (Deep review)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-glow btn-block" id="btn-generate-plan">
+                                    <i class="fa-solid fa-atom"></i> Generate AI Plan
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Generated Plan Results -->
+                        <div class="planner-results-panel glass empty" id="planner-results-panel">
+                            <div class="empty-state-results" id="planner-empty-state">
+                                <div class="pulse-icon"><i class="fa-regular fa-calendar-plus"></i></div>
+                                <h3>No Roadmap Generated Yet</h3>
+                                <p>Fill out the configuration form and trigger the generator to construct your customized study path.</p>
+                            </div>
+
+                            <div class="results-content hidden" id="planner-results-content">
+                                <div class="results-header">
+                                    <h3><i class="fa-solid fa-route"></i> Your Customized Study Plan</h3>
+                                    <div class="header-actions">
+                                        <button class="btn btn-outline btn-sm" id="btn-download-plan">
+                                            <i class="fa-solid fa-download"></i> Export JSON
+                                        </button>
+                                        <button class="btn btn-outline btn-sm" id="btn-reset-plan">
+                                            <i class="fa-solid fa-rotate-left"></i> Reset Plan
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="overall-progress-bar-container">
+                                    <div class="progress-bar-label">
+                                        <span>Overall Plan Completion</span>
+                                        <span id="plan-progress-percent">0%</span>
+                                    </div>
+                                    <div class="progress-track">
+                                        <div class="progress-fill" id="plan-progress-fill" style="width: 0%;"></div>
+                                    </div>
+                                </div>
+
+                                <div class="timeline" id="plan-timeline-container">
+                                    <!-- Dynamic Timeline Weeks go here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- AI DOUBT SOLVER MODULE -->
+                <section id="doubt-solver" class="content-section">
+                    <div class="doubt-solver-container glass">
+                        <!-- Chat Area -->
+                        <div class="chat-wrapper">
+                            <div class="chat-header">
+                                <div class="solver-info">
+                                    <div class="avatar pulse">
+                                        <i class="fa-solid fa-robot"></i>
+                                    </div>
+                                    <div class="chat-titles">
+                                        <h3>Aura Solver</h3>
+                                        <span class="subtext">Equipped with Gemini for code, logic & math explanation</span>
+                                    </div>
+                                </div>
+                                <button class="btn btn-outline btn-sm" id="btn-clear-chat">
+                                    <i class="fa-solid fa-trash-can"></i> Clear Chat
+                                </button>
+                            </div>
+
+                            <div class="chat-messages" id="chat-messages-container">
+                                <div class="chat-message bot">
+                                    <div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>
+                                    <div class="msg-content">
+                                        <p>Hello! I am Aura, your academic companion. You can ask me any doubt about math formulas, coding questions, science concepts, or essays.</p>
+                                        <p>Feel free to input math equations (e.g., <code>x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}</code>) or paste code snippets directly.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Input Area -->
+                            <div class="chat-input-area">
+                                <div class="chat-input-bar">
+                                    <button class="input-action-btn" id="btn-chat-code" title="Insert Code Block">
+                                        <i class="fa-solid fa-code"></i>
+                                    </button>
+                                    <button class="input-action-btn" id="btn-chat-math" title="Insert LaTeX Math">
+                                        <i class="fa-solid fa-square-root-variable"></i>
+                                    </button>
+                                    <textarea id="chat-input-field" placeholder="Ask a question or paste code here... (Ctrl+Enter to send)" rows="1"></textarea>
+                                    <button class="chat-send-btn" id="btn-send-message">
+                                        <i class="fa-solid fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- POMODORO FOCUS TIMER MODULE -->
+                <section id="pomodoro" class="content-section">
+                    <div class="pomodoro-grid">
+                        <div class="timer-panel glass">
+                            <div class="timer-modes">
+                                <button class="timer-mode-btn active" data-duration="1500">Pomodoro (25m)</button>
+                                <button class="timer-mode-btn" data-duration="300">Short Break (5m)</button>
+                                <button class="timer-mode-btn" data-duration="900">Long Break (15m)</button>
+                            </div>
+
+                            <div class="timer-display-container">
+                                <svg class="timer-ring" width="300" height="300">
+                                    <circle class="timer-ring__circle-bg" stroke="rgba(255,255,255,0.02)" stroke-width="12" fill="transparent" r="130" cx="150" cy="150"/>
+                                    <circle class="timer-ring__circle" id="timer-progress-circle" stroke="var(--accent-pink)" stroke-width="12" fill="transparent" r="130" cx="150" cy="150" stroke-dasharray="816.8" stroke-dashoffset="0"/>
+                                </svg>
+                                <div class="timer-text" id="timer-time-display">25:00</div>
+                            </div>
+
+                            <div class="timer-controls">
+                                <button class="timer-ctrl-btn btn-round" id="btn-timer-toggle" title="Start/Pause">
+                                    <i class="fa-solid fa-play"></i>
+                                </button>
+                                <button class="timer-ctrl-btn btn-round-secondary" id="btn-timer-reset" title="Reset">
+                                    <i class="fa-solid fa-arrow-rotate-left"></i>
+                                </button>
+                            </div>
+
+                            <div class="timer-stats-summary" id="timer-sessions-info">
+                                Session 1 of 4 • Remaining: 25 minutes
+                            </div>
+                        </div>
+
+                        <!-- Sound generator panel -->
+                        <div class="sounds-panel glass">
+                            <h3><i class="fa-solid fa-music"></i> Focus Soundscapes</h3>
+                            <p class="section-desc">Synthesized in real-time using Web Audio. No external files needed.</p>
+
+                            <div class="soundscape-list">
+                                <div class="soundscape-item">
+                                    <div class="soundscape-info">
+                                        <span class="sound-name"><i class="fa-solid fa-cloud-showers-heavy"></i> Cosmic Rain</span>
+                                        <span class="sound-desc">Soft continuous pink-filtered rain synthesis</span>
+                                    </div>
+                                    <div class="soundscape-controls">
+                                        <button class="sound-toggle" data-sound="rain"><i class="fa-solid fa-play"></i></button>
+                                        <input type="range" class="sound-volume" data-sound="rain" min="0" max="1" step="0.05" value="0.5">
+                                    </div>
+                                </div>
+
+                                <div class="soundscape-item">
+                                    <div class="soundscape-info">
+                                        <span class="sound-name"><i class="fa-solid fa-radio"></i> Binaural Waves</span>
+                                        <span class="sound-desc">40Hz gamma waves for cognitive concentration</span>
+                                    </div>
+                                    <div class="soundscape-controls">
+                                        <button class="sound-toggle" data-sound="binaural"><i class="fa-solid fa-play"></i></button>
+                                        <input type="range" class="sound-volume" data-sound="binaural" min="0" max="1" step="0.05" value="0.5">
+                                    </div>
+                                </div>
+
+                                <div class="soundscape-item">
+                                    <div class="soundscape-info">
+                                        <span class="sound-name"><i class="fa-solid fa-wind"></i> Solar Wind</span>
+                                        <span class="sound-desc">Calming deep-space white noise sweep</span>
+                                    </div>
+                                    <div class="soundscape-controls">
+                                        <button class="sound-toggle" data-sound="wind"><i class="fa-solid fa-play"></i></button>
+                                        <input type="range" class="sound-volume" data-sound="wind" min="0" max="1" step="0.05" value="0.5">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SPACED REPETITION FLASHCARDS MODULE -->
+                <section id="flashcards" class="content-section">
+                    <div class="flashcard-layout">
+                        <!-- Left Panel: Create and Manage decks -->
+                        <div class="flashcard-sidebar glass">
+                            <h3>Decks & Creation</h3>
+                            <p class="section-desc">Create custom study flashcards to trigger active recall.</p>
+                            
+                            <form id="create-flashcard-form">
+                                <div class="form-group">
+                                    <label for="fc-deck">Category/Subject</label>
+                                    <input type="text" id="fc-deck" placeholder="e.g. Physics, JS Basics" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="fc-front">Front Question</label>
+                                    <textarea id="fc-front" rows="2" placeholder="e.g. What is Schrödinger's Wave Equation?" required></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="fc-back">Back Answer</label>
+                                    <textarea id="fc-back" rows="2" placeholder="e.g. H\psi = E\psi. Describes the behavior of quantum systems." required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block">
+                                    <i class="fa-solid fa-plus"></i> Add Flashcard
+                                </button>
+                            </form>
+
+                            <div class="deck-list-container">
+                                <h4>Your Categories</h4>
+                                <div class="deck-chips" id="deck-chips-container">
+                                    <span class="deck-chip active" data-deck="all">All Cards (0)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Panel: Practice card view -->
+                        <div class="flashcard-arena glass">
+                            <div class="arena-header">
+                                <div class="card-count" id="flashcard-counter">Card 0 of 0</div>
+                                <button class="btn btn-outline btn-sm" id="btn-clear-cards">
+                                    <i class="fa-solid fa-trash-can"></i> Delete All
+                                </button>
+                            </div>
+
+                            <div class="flashcard-wrapper" id="flashcard-stage-wrapper">
+                                <div class="flashcard-empty-state" id="fc-empty-state">
+                                    <i class="fa-solid fa-clone"></i>
+                                    <h3>No Flashcards Available</h3>
+                                    <p>Create a card on the left panel to begin testing yourself with Spaced Repetition.</p>
+                                </div>
+
+                                <div class="flashcard-element hidden" id="flashcard-box">
+                                    <div class="flashcard-inner" id="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <span class="card-label">Front Question</span>
+                                            <div class="card-content-area" id="fc-front-display">Question content goes here...</div>
+                                            <span class="click-hint">Click Card to Flip</span>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <span class="card-label">Back Answer</span>
+                                            <div class="card-content-area" id="fc-back-display">Answer content goes here...</div>
+                                            <span class="click-hint">Click Card to Flip</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flashcard-grading-controls hidden" id="flashcard-grading-controls">
+                                <span class="rate-question">Rate your recall:</span>
+                                <div class="grade-buttons">
+                                    <button class="btn btn-grade red" data-grade="hard">
+                                        <i class="fa-solid fa-face-frown"></i> Hard (Repeat)
+                                    </button>
+                                    <button class="btn btn-grade yellow" data-grade="medium">
+                                        <i class="fa-solid fa-face-meh"></i> Medium (Review Soon)
+                                    </button>
+                                    <button class="btn btn-grade green" data-grade="easy">
+                                        <i class="fa-solid fa-face-smile"></i> Easy (Mastered)
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SETTINGS MODULE -->
+                <section id="settings" class="content-section">
+                    <div class="settings-container glass">
+                        <h2>System Configuration</h2>
+                        <p class="section-desc">Manage API endpoints, Gemini Integration keys, and system states.</p>
+
+                        <div class="settings-block">
+                            <h3><i class="fa-solid fa-key"></i> Gemini API Authentication</h3>
+                            <p class="block-desc">AuraStudy connects directly to Google AI Studio to power the Study Planner and Doubt Solver. Your key is stored locally in your browser's <code>localStorage</code> and never sent to any external server.</p>
+                            
+                            <div class="form-group">
+                                <label for="settings-api-key">Gemini API Key</label>
+                                <div class="api-key-input-container">
+                                    <input type="password" id="settings-api-key" placeholder="AIzaSy...">
+                                    <button class="btn btn-secondary" id="btn-toggle-key-visibility">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                </div>
+                                <span class="help-text">Don't have a key? Get one for free at the <a href="https://aistudio.google.com/" target="_blank" rel="noopener noreferrer">Google AI Studio <i class="fa-solid fa-arrow-up-right-from-square"></i></a></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="settings-model">Gemini Model Choice</label>
+                                <select id="settings-model">
+                                    <option value="gemini-1.5-flash" selected>Gemini 1.5 Flash (Fastest & Highly Capable)</option>
+                                    <option value="gemini-1.5-pro">Gemini 1.5 Pro (Deepest Logical Reasoning)</option>
+                                </select>
+                            </div>
+                            
+                            <button class="btn btn-primary" id="btn-save-settings">
+                                <i class="fa-solid fa-floppy-disk"></i> Save Key Configuration
+                            </button>
+                        </div>
+
+                        <div class="settings-block border-top">
+                            <h3><i class="fa-solid fa-trash-can"></i> Application Cache Reset</h3>
+                            <p class="block-desc">Resetting will clear all locally saved flashcards, timelines, and progress stats from the browser cache.</p>
+                            <button class="btn btn-danger" id="btn-reset-cache">
+                                <i class="fa-solid fa-triangle-exclamation"></i> Clear All Local Data
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- KaTeX JS Script -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <!-- Core Application Logic Script -->
+    <script src="app.js"></script>
+</body>
+</html>
