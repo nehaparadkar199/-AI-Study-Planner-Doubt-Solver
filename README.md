@@ -1,73 +1,120 @@
-# AuraStudy.AI — AI Study Planner & Doubt Solver
+# AuraStudy.AI — Full-Stack AI Study Planner & Doubt Solver
 
-A premium, feature-rich Single Page Web Application designed for self-paced student learning. Built with HTML5, modern Javascript, and a highly polished CSS custom design system (Vanilla CSS) featuring glassmorphism, responsive elements, and a deep space dark mode.
-
----
-
-## 🌟 Key Features
-
-1. **Dashboard & Metrics Control**:
-   - Live progress updates on timelines and focus targets.
-   - SVG animated circular progress indicators.
-   - Dynamic inspirational quotes and scheduling cards.
-
-2. **AI Study Planner**:
-   - Interactive wizard form (subjects list, exam dates, daily targets, difficulty, learning style).
-   - Generates interactive checklist roadmaps.
-   - Tracks exact overall plan completion statistics.
-   - Supports timeline exports directly to JSON.
-
-3. **AI Doubt Solver**:
-   - Immersive chat interface matching modern AI platforms.
-   - Integrates KaTeX for high-performance LaTeX math expression parsing and rendering.
-   - Multi-line input supporting code blocks and symbol formatting.
-   - Built-in Text-to-Speech (TTS) voice generation to read out complex definitions.
-
-4. **Pomodoro Focus Timer**:
-   - Fully customizable focus rounds with visual circular SVG progress meters.
-   - Real-time synthesizer sound mixer (Rain noise, 40Hz Binaural focus waves, and Solar Wind sweeps) synthesized programmatically using the browser's Web Audio API.
-
-5. **Spaced Repetition Flashcards**:
-   - 3D-flipping flashcard widgets.
-   - Active recall review system to grade recall as Easy, Medium, or Hard.
-   - Category filtering tags.
-
-6. **Settings Page**:
-   - Secure input for Gemini API Key (saved directly to browser `localStorage`).
-   - Choose between `gemini-1.5-flash` or `gemini-1.5-pro` models.
-   - Application cache reset option.
+A modern full-stack web application designed to help students generate optimized study timetables, log task completion, track progress metrics, and solve academic doubts using OpenRouter's `gpt-4o-mini` model.
 
 ---
 
-## 🚀 How to Run Locally
+## 🏗️ Technology Stack
 
-You can launch and run the application locally in multiple ways:
+- **Frontend**: React (Vite) styled with **Tailwind CSS v3**, supporting Light/Dark mode toggling and mobile responsive layouts.
+- **Backend**: Node.js & Express API with CORS capabilities.
+- **Database**: Firebase Firestore for tracking study plan task completion states.
+- **AI Integration**: OpenRouter API (`openai/gpt-4o-mini`).
 
-### Option A: VS Code Live Server (Recommended)
-1. Open the **`AI PROJECT`** folder in VS Code (which has already been launched for you).
-2. Install the **Live Server** extension by Ritwick Dey.
-3. Click the **Go Live** button in the status bar at the bottom right corner.
-4. Your browser will automatically open the application at `http://127.0.0.1:5500/index.html`.
+---
 
-### Option B: Quick Python Static Server
-If you have Python installed, run this command in your terminal from inside the project folder:
-```bash
-python -m http.server 8000
+## 📂 Project Directory Layout
+
 ```
-Then navigate to `http://localhost:8000` in your web browser.
-
-### Option C: Node.js (npx) Static Server
-If you have Node.js installed, run:
-```bash
-npx serve .
+AI PROJECT/
+├── backend/
+│   ├── config/firebase.js          # Firestore admin configuration
+│   ├── controllers/
+│   │   ├── chatController.js       # Doubt solver chat agent
+│   │   ├── plannerController.js    # AI timetable generator
+│   │   └── progressController.js   # Progress logging
+│   ├── routes/                     # Router endpoints mapping
+│   ├── server.js                   # Express main server
+│   └── .env.example                # Backend variable templates
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── Dashboard.jsx       # Stats metrics & uncompleted tasks
+│   │   │   ├── DoubtSolver.jsx     # ChatGPT-like chat viewport
+│   │   │   └── Planner.jsx         # Study plan questionnaire & timeline
+│   │   ├── App.jsx                 # Routing tabs, theme toggle hook
+│   │   └── main.jsx
+│   ├── index.html                  # KaTeX math CDN script additions
+│   ├── tailwind.config.js          # Tailwind v3 configurations
+│   └── package.json                # Frontend packages
+└── README.md                       # Documentation manual
 ```
-Then navigate to the URL provided in the console.
 
 ---
 
-## ⚙️ Configuration
+## 🚀 Setup & Local Installation
 
-1. Obtain a free Gemini API Key from [Google AI Studio](https://aistudio.google.com/).
-2. Open the **Settings** page in **AuraStudy.AI**.
-3. Paste the key in the input box, select your preferred model, and click **Save Key Configuration**.
-4. You are all set! The AI Planner and Doubt Solver will now generate fully personalized results powered by Gemini. (If no key is configured, AuraStudy automatically provides simulated academic content so all modules remain fully testable).
+### Prerequisites
+- **Node.js** (v18 or higher)
+- **Firebase Project**: Create a project in [Firebase Console](https://console.firebase.google.com/) and create a Firestore Database.
+- **OpenRouter Account**: Get an API Key from [OpenRouter](https://openrouter.ai/).
+
+---
+
+### Step 1: Backend Setup
+1. Open a terminal and navigate to the `backend/` directory:
+   ```bash
+   cd backend
+   ```
+2. Install packages:
+   ```bash
+   npm install
+   ```
+3. Copy `.env.example` to `.env` and fill in the values:
+   ```bash
+   cp .env.example .env
+   ```
+   Configure your keys:
+   - `OPENROUTER_API_KEY`: Get from OpenRouter settings.
+   - `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`: Get by creating a new Private Key in **Firebase Project Settings -> Service Accounts**. (Note: If Firebase variables are left empty, the server automatically defaults to a local JSON file database `local_db.json` so you can test it locally without setup!).
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
+   The backend API will run on `http://localhost:5000`.
+
+---
+
+### Step 2: Frontend Setup
+1. Open a new terminal and navigate to the `frontend/` directory:
+   ```bash
+   cd ../frontend
+   ```
+2. Install packages:
+   ```bash
+   npm install
+   ```
+3. Run the Vite development server:
+   ```bash
+   npm run dev
+   ```
+4. Access the web app at `http://localhost:3000` in your browser.
+
+---
+
+## 🌐 Deployment Instructions
+
+### 1. Backend Deployment (Render)
+1. Commit your codebase to a GitHub repository.
+2. Sign in to [Render](https://render.com/) and create a new **Web Service**.
+3. Connect your GitHub repository.
+4. Configure these fields:
+   - **Environment**: `Node`
+   - **Build Command**: `cd backend && npm install`
+   - **Start Command**: `cd backend && npm start`
+5. Under **Environment Variables**, add the keys defined in your `.env` file (`OPENROUTER_API_KEY`, `FIREBASE_PROJECT_ID`, etc.).
+6. Click **Deploy Web Service**. Render will output a URL (e.g., `https://aurastudy-api.onrender.com`).
+
+---
+
+### 2. Frontend Deployment (Vercel)
+1. Sign in to [Vercel](https://vercel.com/) and click **Add New -> Project**.
+2. Connect your GitHub repository.
+3. Configure these fields:
+   - **Framework Preset**: `Vite`
+   - **Root Directory**: `frontend`
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+4. Under **Environment Variables**, add:
+   - `VITE_API_URL`: Point to your deployed Render backend API URL (e.g., `https://aurastudy-api.onrender.com/api`).
+5. Click **Deploy**. Vercel will host your client-side assets automatically.
