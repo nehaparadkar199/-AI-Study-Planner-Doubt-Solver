@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, CalendarRange, MessageSquare, Sun, Moon, Sparkles, Menu, X } from 'lucide-react';
+import { LayoutDashboard, CalendarRange, MessageSquare, BarChart3, Sun, Moon, Sparkles, Menu, X } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import Planner from './components/Planner';
 import DoubtSolver from './components/DoubtSolver';
+import ProgressTracker from './components/ProgressTracker';
 
 const API_BASE_URL = 'http://localhost:5000/api';
 const USER_ID = 'local_user';
@@ -116,6 +117,18 @@ function App() {
             <MessageSquare className="w-5 h-5" />
             Doubt Solver Chat
           </button>
+
+          <button
+            onClick={() => { setActiveTab('progress'); setMobileMenuOpen(false); }}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all duration-200 ${
+              activeTab === 'progress'
+                ? 'bg-violet-50 dark:bg-violet-950/30 text-violet-600 dark:text-violet-400 border-l-4 border-violet-500'
+                : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/40 hover:text-slate-900'
+            }`}
+          >
+            <BarChart3 className="w-5 h-5" />
+            Progress Tracker
+          </button>
         </nav>
 
         <div className="p-4 border-t border-slate-200 dark:border-darkBorder">
@@ -177,6 +190,13 @@ function App() {
           )}
           {activeTab === 'chatbot' && (
             <DoubtSolver 
+              API_BASE_URL={API_BASE_URL}
+            />
+          )}
+          {activeTab === 'progress' && (
+            <ProgressTracker 
+              studyPlan={studyPlan}
+              onUpdatePlan={handleUpdatePlan}
               API_BASE_URL={API_BASE_URL}
             />
           )}
