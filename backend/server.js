@@ -17,6 +17,15 @@ app.use(cors());
 // Parse JSON request bodies
 app.use(express.json());
 
+// Root landing route for Render HTTP health probes
+app.get('/', (req, res) => {
+    res.json({
+        name: 'AuraStudy AI API',
+        status: 'running',
+        endpoints: ['/api/planner', '/api/chat', '/api/progress', '/health']
+    });
+});
+
 // Server health check route
 app.get('/health', (req, res) => {
     res.json({ status: 'healthy', timestamp: new Date() });
@@ -33,7 +42,7 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: 'Internal Server Error', message: err.message });
 });
 
-// Start Server listening
-app.listen(PORT, () => {
-    console.log(`🚀 AuraStudy Server running on port ${PORT}`);
+// Start Server listening on 0.0.0.0 for Render compatibility
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 AuraStudy Server running on port ${PORT} (host: 0.0.0.0)`);
 });
