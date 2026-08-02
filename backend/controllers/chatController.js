@@ -40,8 +40,10 @@ End your response with 2 follow-up practice/recap questions to check the student
             { role: 'user', content: query }
         ];
 
+        const openRouterModel = process.env.OPENROUTER_MODEL || 'nvidia/nemotron-3-ultra-550b-a55b:free';
+
         const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
-            model: 'openai/gpt-4o-mini',
+            model: openRouterModel,
             messages: messages
         }, {
             headers: {

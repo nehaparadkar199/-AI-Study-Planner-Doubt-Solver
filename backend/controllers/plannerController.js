@@ -43,8 +43,10 @@ You MUST return a JSON object. Do NOT wrap the JSON in code fences or add extra 
 }
 Distribute tasks across weeks leading up to the target date. Provide 2-4 concrete tasks per week. Make sure the response is valid JSON.`;
 
+        const openRouterModel = process.env.OPENROUTER_MODEL || 'nvidia/nemotron-3-ultra-550b-a55b:free';
+
         const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
-            model: 'openai/gpt-4o-mini',
+            model: openRouterModel,
             messages: [
                 { role: 'user', content: prompt }
             ],
