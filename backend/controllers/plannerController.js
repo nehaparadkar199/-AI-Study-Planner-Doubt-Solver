@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export const generateStudyPlan = async (req, res) => {
-    const { subjects, examDate, hours, style = 'balanced', difficulty = 'intermediate' } = req.body;
+    const { subjects, examDate, hours, style = 'balanced', difficulty = 'intermediate', divisionMethod = 'equal' } = req.body;
 
     if (!subjects || !examDate || !hours) {
         return res.status(400).json({ error: 'Subjects, examDate, and study hours are required.' });
@@ -14,7 +14,7 @@ export const generateStudyPlan = async (req, res) => {
 
     if (!openRouterKey) {
         console.warn('⚠️ Missing OPENROUTER_API_KEY. Using simulated study planner.');
-        const plan = simulatePlanner(subjects, examDate, hours, style, difficulty);
+        const plan = simulatePlanner(subjects, examDate, hours, style, difficulty, divisionMethod);
         return res.json({ plan, simulated: true });
     }
 
@@ -22,26 +22,26 @@ export const generateStudyPlan = async (req, res) => {
         const prompt = `You are AuraStudy AI. Create a detailed, week-by-week study timetable.
 Inputs:
 - Subjects: ${subjects}
-- Target Exam/Goal Date: ${examDate} (Assume current date is July 20, 2026)
-- Study Hours per Day: ${hours}
-- Learning Style: ${style}
-- Difficulty Level: ${difficulty}
+- Target Exam/Goal Date: ${examDate}
+- Daily Hours: ${hours}
+- Style: ${style}
+- Difficulty: ${difficulty}
+- Hour Division Method: ${divisionMethod}
 
-You MUST return a JSON object. Do NOT wrap the JSON in code fences or add extra text. The response must match this schema:
+You MUST return a JSON object without markdown code blocks. The JSON schema must be:
 {
   "weeks": [
     {
-      "title": "Week 1: [Short Week Topic]",
+      "title": "Week 1: [Topic]",
       "tasks": [
         {
           "name": "[Task Name]",
-          "desc": "[Description of what to study/practice, tailored to style - 1-2 sentences]"
+          "desc": "[Task description]"
         }
       ]
     }
   ]
-}
-Distribute tasks across weeks leading up to the target date. Provide 2-4 concrete tasks per week. Make sure the response is valid JSON.`;
+}`;
 
         const openRouterModel = process.env.OPENROUTER_MODEL || 'nvidia/nemotron-3-ultra-550b-a55b:free';
 
@@ -49,21 +49,23 @@ Distribute tasks across weeks leading up to the target date. Provide 2-4 concret
             model: openRouterModel,
             messages: [
                 { role: 'user', content: prompt }
-            ],
-            response_format: { type: "json_object" }
+            ]
         }, {
             headers: {
                 'Authorization': `Bearer ${openRouterKey}`,
                 'Content-Type': 'application/json',
                 'HTTP-Referer': 'https://aurastudy.ai',
                 'X-Title': 'AuraStudy AI'
-            }
+            },
+            timeout: 15000
         });
 
-        const rawContent = response.data.choices[0].message.content;
-        const parsedPlan = JSON.parse(rawContent.trim());
+        const rawContent = response.data?.choices?.[0]?.message?.content || '';
         
-        // Add default completed: false flag to all tasks
+        // Clean markdown code blocks if present
+        const cleanedJson = rawContent.replace(/```json/gi, '').replace(/```/g, '').trim();
+        const parsedPlan = JSON.parse(cleanedJson);
+        
         if (parsedPlan && parsedPlan.weeks) {
             parsedPlan.weeks.forEach(week => {
                 if (week.tasks) {
@@ -72,23 +74,23 @@ Distribute tasks across weeks leading up to the target date. Provide 2-4 concret
                     });
                 }
             });
+            return res.json({ plan: parsedPlan });
+        } else {
+            throw new Error('Parsed plan did not contain weeks array');
         }
 
-        return res.json({ plan: parsedPlan });
-
     } catch (error) {
-        console.error('❌ OpenRouter Planner error:', error.response?.data || error.message);
-        // Fallback to simulator on API error
-        const plan = simulatePlanner(subjects, examDate, hours, style, difficulty);
-        return res.json({ plan, simulated: true, error: 'API failed, loaded fallback plan.' });
+        console.warn('⚠️ OpenRouter Planner Error (using fallback simulator):', error.response?.data || error.message);
+        // Fail-safe fallback study plan generator
+        const plan = simulatePlanner(subjects, examDate, hours, style, difficulty, divisionMethod);
+        return res.json({ plan, simulated: true, apiError: error.message });
     }
 };
 
 // Local simulation fallback
-function simulatePlanner(subjects, examDate, hours, style, difficulty) {
+function simulatePlanner(subjects, examDate, hours, style, difficulty, divisionMethod) {
     const list = subjects.split(',').map(s => s.trim());
     
-    // Calculate weeks between now and examDate (capped between 2 and 8 weeks)
     const today = new Date('2026-07-20');
     const exam = new Date(examDate);
     const diffTime = Math.abs(exam - today);
@@ -102,35 +104,35 @@ function simulatePlanner(subjects, examDate, hours, style, difficulty) {
         const tasks = [
             {
                 name: `Core Study: ${activeSubject}`,
-                desc: `Understand major parameters and foundations of ${activeSubject} based on a ${style} layout.`,
+                desc: `Master parameters and foundations of ${activeSubject}. Style: ${style}. Daily target: ${hours} hrs (${divisionMethod} division).`,
                 completed: false
             },
             {
-                name: `Practice Session for ${activeSubject}`,
-                desc: `Spend ${hours} hours solving exercises or writing test scripts at ${difficulty} level.`,
+                name: `Practice Session: ${activeSubject}`,
+                desc: `Complete exercises and review flashcards at ${difficulty} level.`,
                 completed: false
             }
         ];
 
         if (w === weeksCount) {
             tasks.push({
-                name: 'Final Mock Exam Review',
-                desc: 'Assess weak points and review flashcards. Ensure 8+ hours of rest before final date.',
+                name: 'Final Mock Exam & Review',
+                desc: 'Review weak topics, solve mock papers, and ensure rest before exam date.',
                 completed: false
             });
         } else {
             tasks.push({
-                name: `Self Quiz: ${activeSubject}`,
-                desc: 'Generate flashcards or do active recall exercises to test retention.',
+                name: `Self Recall Quiz: ${activeSubject}`,
+                desc: 'Active recall exercises and memory check.',
                 completed: false
             });
         }
 
         weeks.push({
-            title: `Week ${w}: Master ${activeSubject}`,
+            title: `Week ${w}: Deepening ${activeSubject}`,
             tasks: tasks
         });
     }
 
-    return { weeks };
+    return { weeks, hours, subjects, examDate, divisionMethod };
 }
